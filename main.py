@@ -267,10 +267,6 @@ if __name__ == '__main__':
 
     fmt = '%(asctime)s:%(filename)s:%(lineno)d:%(levelname)s:%(name)s:%(message)s'
     logging.basicConfig(level=logging.INFO, format=fmt)
-    fh = logging.FileHandler('console.log')
-    fh.setLevel(logging.INFO)
-    fh.setFormatter(logging.Formatter(fmt))
-    logger.addHandler(fh)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('symbols', nargs='+')
