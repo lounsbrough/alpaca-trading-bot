@@ -1,3 +1,4 @@
+import os
 import alpaca_trade_api as alpaca
 import asyncio
 import pandas as pd
@@ -11,9 +12,11 @@ from alpaca_trade_api.rest import TimeFrame
 
 logger = logging.getLogger()
 
-ALPACA_API_KEY = "<key_id>"
-ALPACA_SECRET_KEY = "<secret_key>"
+APCA_API_KEY_ID = os.getenv('APCA_API_KEY_ID')
+APCA_API_SECRET_KEY = os.getenv('APCA_API_SECRET_KEY')
 
+STOCK_MARKET_TIMEZONE = 'America/New_York'
+MINIMUM_BARS_AFTER_OPEN = 23
 
 class ScalpAlgo:
     def __init__(self, api, symbol, lot):
@@ -23,19 +26,16 @@ class ScalpAlgo:
         self._bars = []
         self._l = logger.getChild(self._symbol)
 
-        now = pd.Timestamp.now(tz='America/New_York').floor('1min')
+        now = pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE).floor('1min')
         market_open = now.replace(hour=9, minute=30)
         today = now.strftime('%Y-%m-%d')
         tomorrow = (now + pd.Timedelta('1day')).strftime('%Y-%m-%d')
         while 1:
-            # at inception this results sometimes in api errors. this will work
-            # around it. feel free to remove it once everything is stable
             try:
                 data = api.get_bars(symbol, TimeFrame.Minute, today, tomorrow,
                                     adjustment='raw').df
                 break
             except:
-                # make sure we get bars
                 pass
         bars = data[market_open:]
         self._bars = bars
@@ -67,33 +67,31 @@ class ScalpAlgo:
                         f'state {self._state} mismatch order {self._order}')
 
     def _now(self):
-        return pd.Timestamp.now(tz='America/New_York')
+        return pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE)
 
-    def _outofmarket(self):
+    def _market_closing_soon(self):
         return self._now().time() >= pd.Timestamp('15:55').time()
 
     def checkup(self, position):
-        # self._l.info('periodic task')
-
         now = self._now()
         order = self._order
         if (order is not None and
             order.side == 'buy' and now -
-                order.submitted_at.tz_convert(tz='America/New_York') > pd.Timedelta('2 min')):
+                order.submitted_at.tz_convert(tz=STOCK_MARKET_TIMEZONE) > pd.Timedelta('2 min')):
             last_price = self._api.get_last_trade(self._symbol).price
             self._l.info(
                 f'canceling missed buy order {order.id} at {order.limit_price} '
                 f'(current price = {last_price})')
             self._cancel_order()
 
-        if self._position is not None and self._outofmarket():
+        if self._position is not None and self._market_closing_soon():
             self._submit_sell(bailout=True)
 
     def _cancel_order(self):
         if self._order is not None:
             self._api.cancel_order(self._order.id)
 
-    def _calc_buy_signal(self):
+    def _calculate_buy_signal(self):
         mavg = self._bars.rolling(20).mean().close.values
         closes = self._bars.close.values
         if closes[-2] < mavg[-2] and closes[-1] > mavg[-1]:
@@ -117,12 +115,12 @@ class ScalpAlgo:
 
         self._l.info(
             f'received bar start: {pd.Timestamp(bar.timestamp)}, close: {bar.close}, len(bars): {len(self._bars)}')
-        if len(self._bars) < 21:
+        if len(self._bars) < MINIMUM_BARS_AFTER_OPEN:
             return
-        if self._outofmarket():
+        if self._market_closing_soon():
             return
         if self._state == 'TO_BUY':
-            signal = self._calc_buy_signal()
+            signal = self._calculate_buy_signal()
             if signal:
                 self._submit_buy()
 
@@ -216,12 +214,12 @@ class ScalpAlgo:
 
 
 def main(args):
-    stream = Stream(ALPACA_API_KEY,
-                    ALPACA_SECRET_KEY,
+    stream = Stream(APCA_API_KEY_ID,
+                    APCA_API_SECRET_KEY,
                     base_url=URL('https://paper-api.alpaca.markets'),
                     data_feed='iex')  # <- replace to sip for PRO subscription
-    api = alpaca.REST(key_id=ALPACA_API_KEY,
-                    secret_key=ALPACA_SECRET_KEY,
+    api = alpaca.REST(key_id=APCA_API_KEY_ID,
+                    secret_key=APCA_API_SECRET_KEY,
                     base_url="https://paper-api.alpaca.markets")
 
     fleet = {}
