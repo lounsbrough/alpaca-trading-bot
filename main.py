@@ -211,7 +211,7 @@ def main(args):
     stream = Stream(APCA_API_KEY_ID,
                     APCA_API_SECRET_KEY,
                     base_url=URL('https://paper-api.alpaca.markets'),
-                    data_feed='iex')  # <- replace to sip for PRO subscription
+                    data_feed='sip')
     api = alpaca.REST(key_id=APCA_API_KEY_ID,
                     secret_key=APCA_API_SECRET_KEY,
                     base_url="https://paper-api.alpaca.markets")
