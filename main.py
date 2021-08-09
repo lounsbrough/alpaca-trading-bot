@@ -30,13 +30,7 @@ class ScalpAlgo:
         market_open = now.replace(hour=9, minute=30)
         today = now.strftime('%Y-%m-%d')
         tomorrow = (now + pd.Timedelta('1day')).strftime('%Y-%m-%d')
-        while 1:
-            try:
-                data = api.get_bars(symbol, TimeFrame.Minute, today, tomorrow,
-                                    adjustment='raw').df
-                break
-            except:
-                pass
+        data = api.get_bars(symbol, TimeFrame.Minute, today, tomorrow, adjustment='raw').df
         bars = data[market_open:]
         self._bars = bars
 
