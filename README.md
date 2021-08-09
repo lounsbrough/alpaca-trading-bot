@@ -39,6 +39,20 @@ You can specify as many symbols as you want.  The script is designed to kick off
 is open. Nothing would happen until 21 minutes from the market open as it relies on the
 simple moving average as the buy signal.
 
+## PM2 Deployment
+There is a configuration file `pm2.config.js` which can be modified to control the Python process on the machine where the script is running. More information about PM2 config files here: https://pm2.keymetrics.io/docs/usage/application-declaration/
+
+The process can be started by running the following command:
+
+```sh
+$ pm2 start pm2.config.js
+```
+
+You can then save your PM2 state so that your apps are persistent through reboots:
+
+```sh
+$ pm2 save
+```
 
 ## Strategy
 The algorithm idea is to buy the stock upon the buy signal (20 minute
