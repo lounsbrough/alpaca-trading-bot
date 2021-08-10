@@ -1,0 +1,394 @@
+[
+    {
+        "symbol": "SNDL",
+        "lot": 1000
+    },
+    {
+        "symbol": "MSFT",
+        "lot": 1000
+    },
+    {
+        "symbol": "AAL",
+        "lot": 1000
+    },
+    {
+        "symbol": "SNAP",
+        "lot": 1000
+    },
+    {
+        "symbol": "BB",
+        "lot": 1000
+    },
+    {
+        "symbol": "WMT",
+        "lot": 1000
+    },
+    {
+        "symbol": "WISH",
+        "lot": 1000
+    },
+    {
+        "symbol": "TXMD",
+        "lot": 1000
+    },
+    {
+        "symbol": "PTON",
+        "lot": 1000
+    },
+    {
+        "symbol": "CPRX",
+        "lot": 1000
+    },
+    {
+        "symbol": "AAPL",
+        "lot": 1000
+    },
+    {
+        "symbol": "TSLA",
+        "lot": 1000
+    },
+    {
+        "symbol": "AMC",
+        "lot": 1000
+    },
+    {
+        "symbol": "F",
+        "lot": 1000
+    },
+    {
+        "symbol": "GE",
+        "lot": 1000
+    },
+    {
+        "symbol": "NIO",
+        "lot": 1000
+    },
+    {
+        "symbol": "DIS",
+        "lot": 1000
+    },
+    {
+        "symbol": "AMZN",
+        "lot": 1000
+    },
+    {
+        "symbol": "PLUG",
+        "lot": 1000
+    },
+    {
+        "symbol": "CCL",
+        "lot": 1000
+    },
+    {
+        "symbol": "NOK",
+        "lot": 1000
+    },
+    {
+        "symbol": "ACB",
+        "lot": 1000
+    },
+    {
+        "symbol": "PFE",
+        "lot": 1000
+    },
+    {
+        "symbol": "GPRO",
+        "lot": 1000
+    },
+    {
+        "symbol": "ZOM",
+        "lot": 1000
+    },
+    {
+        "symbol": "NAKD",
+        "lot": 1000
+    },
+    {
+        "symbol": "DAL",
+        "lot": 1000
+    },
+    {
+        "symbol": "PLTR",
+        "lot": 1000
+    },
+    {
+        "symbol": "GME",
+        "lot": 1000
+    },
+    {
+        "symbol": "NFLX",
+        "lot": 1000
+    },
+    {
+        "symbol": "BABA",
+        "lot": 1000
+    },
+    {
+        "symbol": "BAC",
+        "lot": 1000
+    },
+    {
+        "symbol": "OGI",
+        "lot": 1000
+    },
+    {
+        "symbol": "COIN",
+        "lot": 1000
+    },
+    {
+        "symbol": "TLRY",
+        "lot": 1000
+    },
+    {
+        "symbol": "FB",
+        "lot": 1000
+    },
+    {
+        "symbol": "SPCE",
+        "lot": 1000
+    },
+    {
+        "symbol": "SBUX",
+        "lot": 1000
+    },
+    {
+        "symbol": "CGC",
+        "lot": 1000
+    },
+    {
+        "symbol": "AMD",
+        "lot": 1000
+    },
+    {
+        "symbol": "NVDA",
+        "lot": 1000
+    },
+    {
+        "symbol": "T",
+        "lot": 1000
+    },
+    {
+        "symbol": "TWTR",
+        "lot": 1000
+    },
+    {
+        "symbol": "VOO",
+        "lot": 1000
+    },
+    {
+        "symbol": "SPY",
+        "lot": 1000
+    },
+    {
+        "symbol": "MRNA",
+        "lot": 1000
+    },
+    {
+        "symbol": "KO",
+        "lot": 1000
+    },
+    {
+        "symbol": "FCEL",
+        "lot": 1000
+    },
+    {
+        "symbol": "NCLH",
+        "lot": 1000
+    },
+    {
+        "symbol": "IDEX",
+        "lot": 1000
+    },
+    {
+        "symbol": "WKHS",
+        "lot": 1000
+    },
+    {
+        "symbol": "CTRM",
+        "lot": 1000
+    },
+    {
+        "symbol": "GM",
+        "lot": 1000
+    },
+    {
+        "symbol": "UAL",
+        "lot": 1000
+    },
+    {
+        "symbol": "ZNGA",
+        "lot": 1000
+    },
+    {
+        "symbol": "UBER",
+        "lot": 1000
+    },
+    {
+        "symbol": "BA",
+        "lot": 1000
+    },
+    {
+        "symbol": "PSEC",
+        "lot": 1000
+    },
+    {
+        "symbol": "ABNB",
+        "lot": 1000
+    },
+    {
+        "symbol": "CRON",
+        "lot": 1000
+    },
+    {
+        "symbol": "SQ",
+        "lot": 1000
+    },
+    {
+        "symbol": "DKNG",
+        "lot": 1000
+    },
+    {
+        "symbol": "RBLX",
+        "lot": 1000
+    },
+    {
+        "symbol": "GOOGL",
+        "lot": 1000
+    },
+    {
+        "symbol": "LUV",
+        "lot": 1000
+    },
+    {
+        "symbol": "NKLA",
+        "lot": 1000
+    },
+    {
+        "symbol": "OCGN",
+        "lot": 1000
+    },
+    {
+        "symbol": "JNJ",
+        "lot": 1000
+    },
+    {
+        "symbol": "GNUS",
+        "lot": 1000
+    },
+    {
+        "symbol": "ARKK",
+        "lot": 1000
+    },
+    {
+        "symbol": "BNGO",
+        "lot": 1000
+    },
+    {
+        "symbol": "SIRI",
+        "lot": 1000
+    },
+    {
+        "symbol": "PYPL",
+        "lot": 1000
+    },
+    {
+        "symbol": "MRO",
+        "lot": 1000
+    },
+    {
+        "symbol": "CLOV",
+        "lot": 1000
+    },
+    {
+        "symbol": "RCL",
+        "lot": 1000
+    },
+    {
+        "symbol": "XOM",
+        "lot": 1000
+    },
+    {
+        "symbol": "JBLU",
+        "lot": 1000
+    },
+    {
+        "symbol": "HEXO",
+        "lot": 1000
+    },
+    {
+        "symbol": "NKE",
+        "lot": 1000
+    },
+    {
+        "symbol": "RIOT",
+        "lot": 1000
+    },
+    {
+        "symbol": "VTI",
+        "lot": 1000
+    },
+    {
+        "symbol": "ET",
+        "lot": 1000
+    },
+    {
+        "symbol": "SONY",
+        "lot": 1000
+    },
+    {
+        "symbol": "SENS",
+        "lot": 1000
+    },
+    {
+        "symbol": "IVR",
+        "lot": 1000
+    },
+    {
+        "symbol": "GSAT",
+        "lot": 1000
+    },
+    {
+        "symbol": "NNDM",
+        "lot": 1000
+    },
+    {
+        "symbol": "FUBO",
+        "lot": 1000
+    },
+    {
+        "symbol": "SOS",
+        "lot": 1000
+    },
+    {
+        "symbol": "CHPT",
+        "lot": 1000
+    },
+    {
+        "symbol": "INO",
+        "lot": 1000
+    },
+    {
+        "symbol": "PENN",
+        "lot": 1000
+    },
+    {
+        "symbol": "NRZ",
+        "lot": 1000
+    },
+    {
+        "symbol": "TSM",
+        "lot": 1000
+    },
+    {
+        "symbol": "QQQ",
+        "lot": 1000
+    },
+    {
+        "symbol": "SAVE",
+        "lot": 1000
+    },
+    {
+        "symbol": "TNXP",
+        "lot": 1000
+    }
+]

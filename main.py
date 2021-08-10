@@ -5,6 +5,7 @@ import pandas as pd
 import pytz
 import sys
 import logging
+import json
 
 from alpaca_trade_api import Stream
 from alpaca_trade_api.common import URL
@@ -207,7 +208,7 @@ class ScalpAlgo:
         self._state = new_state
 
 
-def main(args):
+def main():
     stream = Stream(APCA_API_KEY_ID,
                     APCA_API_SECRET_KEY,
                     base_url=URL('https://paper-api.alpaca.markets'),
@@ -216,18 +217,23 @@ def main(args):
                     secret_key=APCA_API_SECRET_KEY,
                     base_url="https://paper-api.alpaca.markets")
 
+    with open('stock-selections.json') as f:
+        stock_selections = json.load(f)
+
     fleet = {}
-    symbols = args.symbols
-    for symbol in symbols:
-        algo = ScalpAlgo(api, symbol, lot=args.lot)
-        fleet[symbol] = algo
+
+    for stock_selection in stock_selections:
+        print(stock_selection['symbol'])
+
+        algo = ScalpAlgo(api, stock_selection['symbol'], stock_selection['lot'])
+        fleet[stock_selection['symbol']] = algo
 
     async def on_bars(data):
         if data.symbol in fleet:
             fleet[data.symbol].on_bar(data)
 
-    for symbol in symbols:
-        stream.subscribe_bars(on_bars, symbol)
+    for stock_selection in stock_selections:
+        stream.subscribe_bars(on_bars, stock_selection['symbol'])
 
     async def on_trade_updates(data):
         logger.info(f'trade_updates {data}')
@@ -256,13 +262,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    import argparse
-
     fmt = '%(asctime)s:%(filename)s:%(lineno)d:%(levelname)s:%(name)s:%(message)s'
     logging.basicConfig(level=logging.INFO, format=fmt)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('symbols', nargs='+')
-    parser.add_argument('--lot', type=float, default=2000)
-
-    main(parser.parse_args())
+    main()
