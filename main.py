@@ -223,7 +223,7 @@ def main():
     fleet = {}
 
     for stock_selection in stock_selections:
-        print(stock_selection['symbol'])
+        logger.info(f'selected stock {stock_selection}')
 
         algo = ScalpAlgo(api, stock_selection['symbol'], stock_selection['lot'])
         fleet[stock_selection['symbol']] = algo
