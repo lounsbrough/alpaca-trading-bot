@@ -36,10 +36,6 @@
         "lot": 1000
     },
     {
-        "symbol": "CPRX",
-        "lot": 1000
-    },
-    {
         "symbol": "AAPL",
         "lot": 1000
     },
@@ -113,10 +109,6 @@
     },
     {
         "symbol": "GME",
-        "lot": 1000
-    },
-    {
-        "symbol": "NFLX",
         "lot": 1000
     },
     {
