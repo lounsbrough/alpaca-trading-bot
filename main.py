@@ -20,7 +20,7 @@ APCA_API_SECRET_KEY = os.getenv('APCA_API_SECRET_KEY')
 
 STOCK_MARKET_TIMEZONE = 'America/New_York'
 
-class STOCKSTATE(Enum):
+class StockState(Enum):
     TO_BUY = 1
     BUY_SUBMITTED = 2
     TO_SELL = 3
@@ -54,17 +54,17 @@ class ScalpAlgo:
         self._position = position[0] if len(position) > 0 else None
         if self._position is not None:
             if self._order is None:
-                self._state = STOCKSTATE.TO_SELL
+                self._state = StockState.TO_SELL
             else:
-                self._state = STOCKSTATE.SELL_SUBMITTED
+                self._state = StockState.SELL_SUBMITTED
                 if self._order.side != 'sell':
                     self._l.warn(
                         f'state {self._state} mismatch order {self._order}')
         else:
             if self._order is None:
-                self._state = STOCKSTATE.TO_BUY
+                self._state = StockState.TO_BUY
             else:
-                self._state = STOCKSTATE.BUY_SUBMITTED
+                self._state = StockState.BUY_SUBMITTED
                 if self._order.side != 'buy':
                     self._l.warn(
                         f'state {self._state} mismatch order {self._order}')
@@ -127,7 +127,7 @@ class ScalpAlgo:
         if self._too_early_to_trade() or self._market_closing_soon():
             return
 
-        if self._state == STOCKSTATE.TO_BUY:
+        if self._state == StockState.TO_BUY:
             signal = self._calculate_buy_signal()
             if signal:
                 self._submit_buy()
@@ -136,14 +136,14 @@ class ScalpAlgo:
         self._l.info(f'order update: {event} = {order}')
         if event == 'fill':
             self._order = None
-            if self._state == STOCKSTATE.BUY_SUBMITTED:
+            if self._state == StockState.BUY_SUBMITTED:
                 self._position = self._api.get_position(self._symbol)
-                self._transition(STOCKSTATE.TO_SELL)
+                self._transition(StockState.TO_SELL)
                 self._submit_sell()
                 return
-            elif self._state == STOCKSTATE.SELL_SUBMITTED:
+            elif self._state == StockState.SELL_SUBMITTED:
                 self._position = None
-                self._transition(STOCKSTATE.TO_BUY)
+                self._transition(StockState.TO_BUY)
                 return
         elif event == 'partial_fill':
             self._position = self._api.get_position(self._symbol)
@@ -153,14 +153,14 @@ class ScalpAlgo:
             if event == 'rejected':
                 self._l.warn(f'order rejected: current order = {self._order}')
             self._order = None
-            if self._state == STOCKSTATE.BUY_SUBMITTED:
+            if self._state == StockState.BUY_SUBMITTED:
                 if self._position is not None:
-                    self._transition(STOCKSTATE.TO_SELL)
+                    self._transition(StockState.TO_SELL)
                     self._submit_sell()
                 else:
-                    self._transition(STOCKSTATE.TO_BUY)
-            elif self._state == STOCKSTATE.SELL_SUBMITTED:
-                self._transition(STOCKSTATE.TO_SELL)
+                    self._transition(StockState.TO_BUY)
+            elif self._state == StockState.SELL_SUBMITTED:
+                self._transition(StockState.TO_SELL)
                 self._submit_sell(bailout=True)
             else:
                 self._l.warn(f'unexpected state for {event}: {self._state}')
@@ -179,12 +179,12 @@ class ScalpAlgo:
             )
         except Exception as e:
             self._l.info(e)
-            self._transition(STOCKSTATE.TO_BUY)
+            self._transition(StockState.TO_BUY)
             return
 
         self._order = order
         self._l.info(f'submitted buy {order}')
-        self._transition(STOCKSTATE.BUY_SUBMITTED)
+        self._transition(StockState.BUY_SUBMITTED)
 
     def _submit_sell(self, bailout=False):
         params = dict(
@@ -209,12 +209,12 @@ class ScalpAlgo:
             order = self._api.submit_order(**params)
         except Exception as e:
             self._l.error(e)
-            self._transition(STOCKSTATE.TO_SELL)
+            self._transition(StockState.TO_SELL)
             return
 
         self._order = order
         self._l.info(f'submitted sell {order}')
-        self._transition(STOCKSTATE.SELL_SUBMITTED)
+        self._transition(StockState.SELL_SUBMITTED)
 
     def _transition(self, new_state):
         self._l.info(f'transition from {self._state} to {new_state}')
