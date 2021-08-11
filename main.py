@@ -6,6 +6,7 @@ import pytz
 import sys
 import logging
 import json
+from datetime import datetime
 
 from alpaca_trade_api import Stream
 from alpaca_trade_api.common import URL
@@ -17,7 +18,6 @@ APCA_API_KEY_ID = os.getenv('APCA_API_KEY_ID')
 APCA_API_SECRET_KEY = os.getenv('APCA_API_SECRET_KEY')
 
 STOCK_MARKET_TIMEZONE = 'America/New_York'
-MINIMUM_BARS_AFTER_OPEN = 23
 
 class ScalpAlgo:
     def __init__(self, api, symbol, lot):
@@ -38,6 +38,7 @@ class ScalpAlgo:
         self._init_state()
 
     def _init_state(self):
+        self._next_close = self._api.get_clock().next_close
         symbol = self._symbol
         order = [o for o in self._api.list_orders() if o.symbol == symbol]
         position = [p for p in self._api.list_positions()
@@ -64,15 +65,20 @@ class ScalpAlgo:
     def _now(self):
         return pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE)
 
+    def _update_next_close(self, next_close):
+        self._next_close = next_close
+
+    def _too_early_to_trade(self):
+        return self._now().time() < pd.Timestamp('10:05').time()
+
     def _market_closing_soon(self):
-        return self._now().time() >= pd.Timestamp('15:55').time()
+        return self._now() >= self._next_close - pd.Timedelta('5 min')
 
     def checkup(self, position):
         now = self._now()
         order = self._order
         if (order is not None and
-            order.side == 'buy' and now -
-                order.submitted_at.tz_convert(tz=STOCK_MARKET_TIMEZONE) > pd.Timedelta('2 min')):
+            order.side == 'buy' and now - order.submitted_at.tz_convert(tz=STOCK_MARKET_TIMEZONE) > pd.Timedelta('2 min')):
             last_price = self._api.get_last_trade(self._symbol).price
             self._l.info(
                 f'canceling missed buy order {order.id} at {order.limit_price} '
@@ -110,10 +116,10 @@ class ScalpAlgo:
 
         self._l.info(
             f'received bar start: {pd.Timestamp(bar.timestamp)}, close: {bar.close}, len(bars): {len(self._bars)}')
-        if len(self._bars) < MINIMUM_BARS_AFTER_OPEN:
+
+        if self._too_early_to_trade() or self._market_closing_soon():
             return
-        if self._market_closing_soon():
-            return
+
         if self._state == 'TO_BUY':
             signal = self._calculate_buy_signal()
             if signal:
@@ -221,6 +227,7 @@ def main():
         stock_selections = json.load(f)
 
     fleet = {}
+    next_close = api.get_clock().next_close
 
     for stock_selection in stock_selections:
         logger.info(f'selected stock {stock_selection}')
@@ -243,18 +250,20 @@ def main():
 
     stream.subscribe_trade_updates(on_trade_updates)
 
+    def refresh_next_close():
+        next_close = api.get_clock().next_close
+
     async def periodic():
         while True:
-            if not api.get_clock().is_open:
-                logger.info('market is no longer open, exiting program')
-                sys.exit(0)
+            if api.get_clock().is_open:
+                refresh_next_close()
+                positions = api.list_positions()
+                for symbol, algo in fleet.items():
+                    algo._update_next_close(next_close)
+                    pos = [p for p in positions if p.symbol == symbol]
+                    algo.checkup(pos[0] if len(pos) > 0 else None)
 
             await asyncio.sleep(30)
-
-            positions = api.list_positions()
-            for symbol, algo in fleet.items():
-                pos = [p for p in positions if p.symbol == symbol]
-                algo.checkup(pos[0] if len(pos) > 0 else None)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(
