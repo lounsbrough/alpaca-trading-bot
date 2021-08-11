@@ -245,13 +245,16 @@ def main():
 
     async def periodic():
         while True:
-            if api.get_clock().is_open:
-                positions = api.list_positions()
-                for symbol, algo in fleet.items():
-                    pos = [p for p in positions if p.symbol == symbol]
-                    algo.checkup(pos[0] if len(pos) > 0 else None)
+            if not api.get_clock().is_open:
+                logger.info('market is no longer open, exiting program')
+                sys.exit(0)
 
             await asyncio.sleep(30)
+
+            positions = api.list_positions()
+            for symbol, algo in fleet.items():
+                pos = [p for p in positions if p.symbol == symbol]
+                algo.checkup(pos[0] if len(pos) > 0 else None)
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(
@@ -259,7 +262,6 @@ def main():
         periodic(),
     ))
     loop.close()
-
 
 if __name__ == '__main__':
     fmt = '%(asctime)s:%(filename)s:%(lineno)d:%(levelname)s:%(name)s:%(message)s'
