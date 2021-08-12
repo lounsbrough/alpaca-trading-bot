@@ -76,7 +76,10 @@ class ScalpAlgo:
         self._next_close = next_close
 
     def _too_early_to_trade(self):
-        return self._now().time() < pd.Timestamp('10:05').time()
+        return self._now().time() < pd.Timestamp('10:30').time()
+
+    def _is_lunch_break(self):
+        return self._now().time() >= pd.Timestamp('11:55').time() and self._now().time() <= pd.Timestamp('1:05').time()
 
     def _market_closing_soon(self):
         return self._now() >= self._next_close - pd.Timedelta('5 min')
@@ -124,7 +127,7 @@ class ScalpAlgo:
         self._l.info(
             f'received bar start: {pd.Timestamp(bar.timestamp)}, close: {bar.close}, len(bars): {len(self._bars)}')
 
-        if self._too_early_to_trade() or self._market_closing_soon():
+        if self._too_early_to_trade() or self._is_lunch_break() or self._market_closing_soon():
             return
 
         if self._state == StockState.TO_BUY:
