@@ -72,8 +72,11 @@ class ScalpAlgo:
     def _now(self):
         return pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE)
 
-    def _update_next_close(self, next_close):
+    def update_next_close(self, next_close):
         self._next_close = next_close
+
+        if self._market_closing_soon():
+            self._api.close_all_positions()
 
     def _too_early_to_trade(self):
         return self._now().time() < pd.Timestamp('10:30').time()
@@ -269,7 +272,7 @@ def main():
                 refresh_next_close()
                 positions = api.list_positions()
                 for symbol, algo in fleet.items():
-                    algo._update_next_close(next_close)
+                    algo.update_next_close(next_close)
                     pos = [p for p in positions if p.symbol == symbol]
                     algo.checkup(pos[0] if len(pos) > 0 else None)
 
