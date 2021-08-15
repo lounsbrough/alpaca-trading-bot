@@ -21,7 +21,7 @@ fi
 
 status=$(pm2 jlist | jq -r '.[] | select(.name == "alpaca-trading-bot") | .pm2_env.status')
 
-if [[ ! $status =~ "online" ]]; then
+if [[ $status =~ "offline" ]]; then
   echo "Trading bot does not appear to be online, sending notification!"
 
   if [[ -z $HTTPS_AUTHENTICATION_SECRET ]]; then
@@ -29,16 +29,7 @@ if [[ ! $status =~ "online" ]]; then
     exit 1
   fi
 
-  curl -X POST \
-    http://127.0.0.1:7239 \
-    -H 'Content-Type: application/json' \
-    -d '{
-        "authCode": "'$HTTPS_AUTHENTICATION_SECRET'",
-        "deviceName": "David - Phone",
-        "action": "pushNote",
-        "noteTitle": "Alpaca Trading Bot",
-        "noteBody": "Trading bot does not appear to be online!"
-    }'
+  curl -X POST -H 'Content-type: application/json' --data '{"text":"Trading bot does not appear to be online!"}' $STOCK_TRADING_BOT_SLACK_WEBHOOK
 
-    date +'%s' > $lastOfflineAlertFile
+  date +'%s' > $lastOfflineAlertFile
 fi
