@@ -5,11 +5,9 @@ name = "pypi"
 
 [packages]
 alpaca-trade-api = ">=1.0.1"
+redis = ">=3.5.3"
 websockets = "*"
 
 [dev-packages]
 pytest = "*"
 pytest-cov = "*"
-
-[requires]
-python_version = "3.6"

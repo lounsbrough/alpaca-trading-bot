@@ -1,7 +1,7 @@
 # Concurrent Scalping Algo
 
-This python script is a working example to execute 
-[scalping trading](https://www.investopedia.com/articles/trading/05/scalping.asp) 
+This python script is a working example to execute
+[scalping trading](https://www.investopedia.com/articles/trading/05/scalping.asp)
 algorithm for [Alpaca API](https://alpaca.markets). This algorithm uses real time order updates
 as well as minute level bar streaming from Polygon via Websockets (see the
 [document](https://docs.alpaca.markets/market-data/#consolidated-market-data) for
@@ -16,15 +16,17 @@ to run this example. For more information about PDT rule, please read the
 [document](https://support.alpaca.markets/hc/en-us/articles/360012203032-Pattern-Day-Trader).
 
 ## Dependency
-This script needs latest [Alpaca Python SDK](https://github.com/alpacahq/alpaca-trade-api-python).
-Please install it using pip
+This script needs the following packages:
+- [Alpaca Python SDK](https://github.com/alpacahq/alpaca-trade-api-python)
+- [redis-py](https://github.com/andymccurdy/redis-py)
 
+Please install them using pip:
 ```sh
 $ pip3 install alpaca-trade-api
+$ pip3 install redis
 ```
 
-or use [pipenv](https://github.com/pypa/pipenv) using `Pipfile` in this directory.
-
+or use [pipenv](https://github.com/pypa/pipenv) using `Pipfile` in this directory:
 ```sh
 $ pipenv install
 ```
@@ -32,12 +34,8 @@ $ pipenv install
 ## Usage
 
 ```sh
-$ python main.py --lot=2000 TSLA FB AAPL
+$ python main.py
 ```
-
-You can specify as many symbols as you want.  The script is designed to kick off while market
-is open. Nothing would happen until 21 minutes from the market open as it relies on the
-simple moving average as the buy signal.
 
 ## PM2 Deployment
 There is a configuration file `pm2.config.js` which can be modified to control the Python process on the machine where the script is running. More information about PM2 config files here: https://pm2.keymetrics.io/docs/usage/application-declaration/
@@ -56,7 +54,7 @@ $ pm2 save
 
 ## Strategy
 The algorithm idea is to buy the stock upon the buy signal (20 minute
-[moving average crossover](https://www.investopedia.com/articles/active-trading/052014/how-use-moving-average-buy-stocks.asp)) 
+[moving average crossover](https://www.investopedia.com/articles/active-trading/052014/how-use-moving-average-buy-stocks.asp))
 as much as `lot` amount of dollar, then immediately sell the position at or above the entry price.
 The assumption is that the market is bouncing upward when this signal occurs in a short period of time.
 The buy signal is extremely simple, but what this strategy achieves is the quick reaction to
