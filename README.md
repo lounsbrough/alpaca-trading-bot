@@ -72,8 +72,7 @@ on the market situation. This is where you can improve the risk control beyond t
 The buy signal is calculated as soon as a minute bar arrives, which typically happen about 4 seconds
 after the top of every minute (this is Polygon's behavior for minute bar streaming).
 
-This example liquidates all watching positions with market order at the end of market hours (03:55pm ET).
-
+This example liquidates all watching positions with market order shortly before the end of market hours.
 
 ## Implementation
 This example heavily relies on Python's asyncio. Although the thread is single, we handle
@@ -114,8 +113,6 @@ a position) or `TO_SELL` (if holding a position) and wait for the next events.
 
 `checkup()` method is the background periodic job to check several conditions, where
 we cancel open orders and sends market sell order if there is an open position.
-
-It exits once the market closes.
 
 ### Note
 Each algo instance owns its child logger, prefixed by the symbol name. The console
