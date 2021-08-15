@@ -6,6 +6,8 @@ import pytz
 import sys
 import logging
 import json
+import requests
+
 from datetime import datetime
 from enum import Enum
 
@@ -27,12 +29,13 @@ class StockState(Enum):
     SELL_SUBMITTED = 4
 
 class ScalpAlgo:
-    def __init__(self, api, symbol, lot):
+    def __init__(self, api, symbol, lot, send_slack_message):
         self._api = api
         self._symbol = symbol
         self._lot = lot
         self._bars = []
         self._l = logger.getChild(self._symbol)
+        self._send_slack_message = send_slack_message
 
         now = pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE).floor('1min')
         market_open = now.replace(hour=9, minute=30)
@@ -58,16 +61,18 @@ class ScalpAlgo:
             else:
                 self._state = StockState.SELL_SUBMITTED
                 if self._order.side != 'sell':
-                    self._l.warn(
-                        f'state {self._state} mismatch order {self._order}')
+                    warning_message = f'state {self._state} mismatch order {self._order}'
+                    self._l.warn(warning_message)
+                    self._send_slack_message(warning_message)
         else:
             if self._order is None:
                 self._state = StockState.TO_BUY
             else:
                 self._state = StockState.BUY_SUBMITTED
                 if self._order.side != 'buy':
-                    self._l.warn(
-                        f'state {self._state} mismatch order {self._order}')
+                    warning_message = f'state {self._state} mismatch order {self._order}'
+                    self._l.warn(warning_message)
+                    self._send_slack_message(warning_message)
 
     def _now(self):
         return pd.Timestamp.now(tz=STOCK_MARKET_TIMEZONE)
@@ -157,7 +162,9 @@ class ScalpAlgo:
             return
         elif event in ('canceled', 'rejected'):
             if event == 'rejected':
-                self._l.warn(f'order rejected: current order = {self._order}')
+                warning_message = f'order rejected: current order = {self._order}'
+                self._l.warn(warning_message)
+                self._send_slack_message(warning_message)
             self._order = None
             if self._state == StockState.BUY_SUBMITTED:
                 if self._position is not None:
@@ -169,7 +176,9 @@ class ScalpAlgo:
                 self._transition(StockState.TO_SELL)
                 self._submit_sell(bailout=True)
             else:
-                self._l.warn(f'unexpected state for {event}: {self._state}')
+                warning_message = f'unexpected state for {event}: {self._state}'
+                self._l.warn(warning_message)
+                self._send_slack_message(warning_message)
 
     def _submit_buy(self):
         trade = self._api.get_last_trade(self._symbol)
@@ -236,6 +245,21 @@ def main():
                     secret_key=APCA_API_SECRET_KEY,
                     base_url="https://paper-api.alpaca.markets")
 
+    if not api.get_clock().is_open:
+        logger.info('Market is not open, aborting process')
+        return
+
+    def send_slack_message(message):
+        headers = {
+            'Content-type': 'application/json',
+        }
+
+        data = f'{{"text": "{message}"}}'
+
+        requests.post(os.getenv('STOCK_TRADING_BOT_SLACK_WEBHOOK'), headers=headers, data=data)
+
+    send_slack_message("Process is starting!")
+
     with open('stock-selections.json') as f:
         stock_selections = json.load(f)
 
@@ -245,7 +269,7 @@ def main():
     for stock_selection in stock_selections:
         logger.info(f'selected stock {stock_selection}')
 
-        algo = ScalpAlgo(api, stock_selection['symbol'], stock_selection['lot'])
+        algo = ScalpAlgo(api, stock_selection['symbol'], stock_selection['lot'], send_slack_message)
         fleet[stock_selection['symbol']] = algo
 
     async def on_bars(data):
